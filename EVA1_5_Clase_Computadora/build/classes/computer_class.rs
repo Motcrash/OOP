@@ -1,2 +1,0 @@
-Computer
-computer_class
