@@ -2,7 +2,7 @@ package proyecto;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-
+import java.io.File;
 //Imports para el manejo de archivos binarios.
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 
 
 
@@ -57,7 +58,7 @@ public class Proyecto {
         } 
         //
         input.close();
-        saveObjects(listaUsuarios, listaDocentes, listaEstudiantes);
+        guardarUsuarios(listaUsuarios, listaDocentes, listaEstudiantes);
     }
 
     // Método para crear usuarios
@@ -151,16 +152,24 @@ public class Proyecto {
 
 
     //Guardar objetos de usuarios
-    public static void saveObjects(Object obj, Object obj2, Object obj3){
+    public static void guardarUsuarios(Object obj, Object obj2, Object obj3){
         try {
             //Streams para definir la ruta de guardado y manipulacion del objeto.
             FileOutputStream openFile = new FileOutputStream("src/proyecto/sysdata/usuarios.obj");
             ObjectOutputStream saveObject = new ObjectOutputStream(openFile);
+            FileOutputStream openFile2 = new FileOutputStream("src/proyecto/sysdata/docentes.obj");
+            ObjectOutputStream saveObject2 = new ObjectOutputStream(openFile2);
+            FileOutputStream openFile3 = new FileOutputStream("src/proyecto/sysdata/estudiantes.obj");
+            ObjectOutputStream saveObject3 = new ObjectOutputStream(openFile3);
             saveObject.writeObject(obj);
-            saveObject.writeObject(obj2);
-            saveObject.writeObject(obj3);
+            saveObject2.writeObject(obj2);
+            saveObject3.writeObject(obj3);
             saveObject.flush();
             saveObject.close();
+            saveObject2.flush();
+            saveObject2.close();
+            saveObject3.flush();
+            saveObject3.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -168,22 +177,70 @@ public class Proyecto {
         }
     }
 
-    // public static void openObjects(){
-    //     try{
-    //         FileInputStream openFile = new FileInputStream("src/sysdata/usuarios.obj");
-    //         ObjectInputStream readObject = new ObjectInputStream(openFile);
+    protected static ArrayList<Usuario> getUsuariosDatabase(){
+        ArrayList<Usuario> lista = new ArrayList<Usuario>();
+        try{
+            FileInputStream openFile = new FileInputStream("src/proyecto/sysdata/usuarios.obj");
+            ObjectInputStream readObject = new ObjectInputStream(openFile);
             
-    //         ArrayList<Usuario> lista = (ArrayList<Usuario>)readObject.readObject(); ///Siempre regresa un objeto de la Clase Object
-    //         readObject.close();
+           lista = (ArrayList<Usuario>)readObject.readObject(); ///Siempre regresa un objeto de la Clase Object
+            System.out.println("Usuarios encontrados");
+            readObject.close();
+            return lista;
             
-    //     }catch(FileNotFoundException e){
+        }catch(FileNotFoundException e){
+            lista=null;
+            System.out.println("Los usuarios no fueron encontrados");
+        }catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        return lista;
+    }
 
-    //     }catch (IOException ex) {
-    //         ex.printStackTrace();
-    //     } catch (ClassNotFoundException ex) {
-    //         ex.printStackTrace();
-    //     }
-    // }
+    protected static ArrayList<Docente> getDocentesDatabase(){
+        ArrayList<Docente> docentes = new ArrayList<Docente>();
 
+        try{
+            FileInputStream openDocentesFile = new FileInputStream("src/proyecto/sysdata/docentes.obj");
+            ObjectInputStream readDocentes = new ObjectInputStream(openDocentesFile);
 
+            docentes = (ArrayList<Docente>)readDocentes.readObject();
+            System.out.println("Docentes encontrados");
+            readDocentes.close();
+            return docentes;
+        }catch(FileNotFoundException e){
+            docentes=null;
+            System.out.println("Los docentes no fueron encontrados");
+        }catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        return docentes;
+    }
+    protected static ArrayList<Estudiante> getEstudiantesDatabase(){
+        ArrayList<Estudiante> estudiantes = new ArrayList<Estudiante>();
+
+        try{
+            FileInputStream openEstudiantesFile = new FileInputStream("src/proyecto/sysdata/estudiantes.obj");
+            ObjectInputStream readEstudiantes =  new ObjectInputStream(openEstudiantesFile);
+
+            estudiantes = (ArrayList<Estudiante>)readEstudiantes.readObject();
+            System.out.println("Estudiantes encontrados");
+            readEstudiantes.close();
+            return estudiantes;
+        }catch(FileNotFoundException e){
+            estudiantes = null;
+            System.out.println("Los estudiantes no fueron encontrados");
+        }catch(IOException e){
+            e.printStackTrace();
+        }catch(ClassNotFoundException e){
+            e.printStackTrace();
+        }
+
+        return estudiantes;
+
+    }
 }
