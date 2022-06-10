@@ -29,8 +29,7 @@ public class Proyecto {
             // listaDocentes.add(new Docente("C", "sadqwhd", "dqwesad", "dsadwq","696969"));
             // listaDocentes.add(new Docente("D", "sadqwhd", "dqwesad", "dsadwq", "asdwq"));
             //Añadimos a la lista de usuarios los usuarios ya establecidos
-            listaUsuarios.addAll(listaEstudiantes);
-            listaUsuarios.addAll(listaDocentes);
+          
             String option;
     
             //Inicio del programa en consola
