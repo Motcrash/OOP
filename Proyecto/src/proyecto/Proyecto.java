@@ -58,6 +58,7 @@ public class Proyecto {
         } catch (Exception e) {
             e.printStackTrace(); //Dado que no conocemos que tipo especifico de excepcion puede ocurrir, atrapamos todas.
         }finally{
+            //Bloque finally para guardar el manejo de archivos independientemente de que sucediera un problema.
             input.close();
             guardarUsuarios(listaUsuarios, listaDocentes, listaEstudiantes);
         }
