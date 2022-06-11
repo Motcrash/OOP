@@ -2,7 +2,6 @@ package proyecto;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.io.File;
 //Imports para el manejo de archivos binarios.
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,81 +9,178 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
-
+import java.io.File;
 
 public class Proyecto {
     static Scanner input = new Scanner(System.in);
     static String user, password, username, lastName, name, noMatricula;
-    
 
     public static void main(String[] args) {
 
-        ArrayList <Usuario> listaUsuarios = getUsuariosDatabase();
-        ArrayList <Estudiante> listaEstudiantes = getEstudiantesDatabase();
-        ArrayList <Docente> listaDocentes = getDocentesDatabase();
-        // Se generan los ArrayList en entorno local para el funcionamiento del programa, en caso de existir los archivos, se intentará leer los usuarios existentes
-        // En caso de no existir dicho archivo, se generara una nueva ArrayList de cada tipo.
-        try { 
-            listaEstudiantes.add(new Estudiante("A", "hola", "dqwesad", "dsadwq"));
-            listaEstudiantes.add(new Estudiante("B", "hola", "dqwesad", "dsadwq"));
-            listaDocentes.add(new Docente("C", "hola", "dqwesad", "dsadwq","696969"));
-            listaDocentes.add(new Docente("D", "hola", "dqwesad", "dsadwq", "asdwq"));
-            menu(listaUsuarios,listaDocentes,listaEstudiantes);
+        // Se generan los ArrayList en entorno local para el funcionamiento del
+        // programa, en caso de existir los archivos, se intentará leer los usuarios
+        // existentes
+        // En caso de no existir dicho archivo, se generara una nueva ArrayList de cada
+        // tipo.
+        ArrayList<Usuario> listaUsuarios = getUsuariosDatabase();
+        ArrayList<Estudiante> listaEstudiantes = getEstudiantesDatabase();
+        ArrayList<Docente> listaDocentes = getDocentesDatabase();
+        try {            
+           menu(listaUsuarios, listaDocentes, listaEstudiantes);
         } catch (Exception e) {
-            e.printStackTrace(); //Dado que no conocemos que tipo especifico de excepcion puede ocurrir, atrapamos todas.
-        }finally{
-            //Bloque finally para guardar el manejo de archivos independientemente de que sucediera un problema.
+            e.printStackTrace(); // Dado que no conocemos que tipo especifico de excepcion puede ocurrir,
+                                 // atrapamos todas.
+        } finally {
             input.close();
             guardarUsuarios(listaUsuarios, listaDocentes, listaEstudiantes);
         }
-        
 
     }
 
-    public static void menu (ArrayList<Usuario> listaUsuarios, ArrayList<Docente> listaDocentes, ArrayList<Estudiante> listaEstudiantes){
+    public static void menu(ArrayList<Usuario> listaUsuarios, ArrayList<Docente> listaDocentes,
+            ArrayList<Estudiante> listaEstudiantes) {
         String option;
         System.out.println("Seleccione una opción: \n a) Inicie sesión \t b) Crear usuario");
+        option = input.nextLine();
+        // Verificación de opción
+        while (!option.equalsIgnoreCase("a") && !option.equalsIgnoreCase("b")) {
+            System.out.println("Elija una opción válida");
             option = input.nextLine();
-            //Verificación de opción
-            while(!option.equalsIgnoreCase("a") && !option.equalsIgnoreCase("b")){
-                System.out.println("Elija una opción válida");
-                option = input.nextLine();
+        }
+
+        // Switch de opciones
+        switch (option.toLowerCase()) {
+            case "a" -> {
+                // logIn(listaUsuarios,listaDocentes,listaEstudiantes);
+                logIn(listaUsuarios, listaDocentes, listaEstudiantes);
             }
-    
-            //Switch de opciones
-            switch(option.toLowerCase()){
-                case "a"->{
-                    //logIn(listaUsuarios,listaDocentes,listaEstudiantes);
-                    Usuario.logIn(listaUsuarios, listaDocentes, listaEstudiantes);
-                } 
-    
-                case "b"->{
-                    //createUser(listaEstudiantes, listaDocentes, listaUsuarios);
-                    Usuario.createUser(listaEstudiantes, listaDocentes, listaUsuarios);
-                }      
-                   
-            } 
+
+            case "b" -> {
+                // createUser(listaEstudiantes, listaDocentes, listaUsuarios);
+                createUser(listaEstudiantes, listaDocentes, listaUsuarios);
+            }
+
+        }
     }
 
-    //Guardar las listas de los de usuarios
-    public static void guardarUsuarios(Object obj, Object obj2, Object obj3){
-        try {
-            
+    // Método para crear usuarios
+    public static void createUser(ArrayList<Estudiante> listaEstudiantes, ArrayList<Docente> listaDocentes,
+            ArrayList<Usuario> listaUsuarios) {
 
-            //Crear el directorio en caso de que no exista (Caso poco probable ya que es entorno local)
+        String option = "";
+        System.out.print("Ingrese su nombre de usuario: ");
+        username = input.nextLine();
+        System.out.print("Ingrese su contraseña: ");
+        password = input.nextLine();
+        System.out.print("Ingrese sus nombres: ");
+        name = input.nextLine();
+        System.out.print("Ingrese sus apellidos: ");
+        lastName = input.nextLine();
+
+        // Asignación de valores del usuario
+        System.out.println("Indique el tipo de usuario: \na) Docente \tb) Estudiante");
+        option = input.nextLine();
+        // Verificación de opción
+        while (!option.equalsIgnoreCase("a") && !option.equalsIgnoreCase("b")) {
+            System.out.println("Elija una opción válida");
+            option = input.nextLine();
+        }
+
+        // Switch de opciones
+        switch (option.toLowerCase()) {
+            case "a" -> {
+                System.out.print("Ingrese sus matricula: ");
+                noMatricula = input.next();
+                // Añade el usuario creado a ambas listas
+                listaDocentes.add(new Docente(username, password, name, lastName, noMatricula));
+                listaUsuarios.add(listaDocentes.get(listaDocentes.size() - 1));
+            }
+
+            case "b" -> {
+                // Añade el usuario creado a ambas listas
+                listaEstudiantes.add(new Estudiante(username, password, name, lastName));
+                listaUsuarios.add(listaEstudiantes.get(listaEstudiantes.size() - 1));
+
+            }
+
+        }
+        System.out.println("Usuario creado exitosamente");
+    }
+
+    // Método para iniciar sesión
+    public static void logIn(ArrayList<Usuario> listaUsuarios, ArrayList<Docente> listaDocentes,
+            ArrayList<Estudiante> listaEstudiantes) {
+        boolean userExists = false;
+
+        if (listaUsuarios.size() > 0) {
+            do {
+                // Ingresamos los datos de la sesión
+                System.out.print("Ingrese su nombre de usuario: ");
+                username = input.next();
+                System.out.print("Ingrese su contraseña: ");
+                password = input.next();
+                System.out.println();
+
+                // Verificamos si los datos ingresados concuerdan con algún usuario de la lista
+                // de usarios
+                for (int i = 0; i < listaUsuarios.size(); i++) {
+                    // Si encuentra un usuario accede a su sesión
+
+                    if (username.equalsIgnoreCase(listaUsuarios.get(i).getUsername())
+                            && password.equals(listaUsuarios.get(i).getPassword())) {
+                        userExists = true;
+                        System.out.println("Sesión iniciada exitosamente");
+                        System.out.println();
+                        // Verifica qué tipo de usuario entró
+                        if (listaUsuarios.get(i) instanceof Estudiante) {
+                            // Llamar al método para la calificación
+
+                            System.out.println("Es un estudiante");
+
+                        } else if (listaUsuarios.get(i) instanceof Docente) {
+                            // Llamar al método para profesores
+
+                            System.out.println("Es un Docente");
+                        }
+                        break;
+                        // Si no encuentra a un usuario lo marca como incorrecto y vuelve a pedir los
+                        // datos
+                    } else {
+                        if (i == listaUsuarios.size() - 1) {
+                            System.out.println("Usuario y/o contraseña incorrectos");
+                            System.out.println();
+                        }
+                    }
+
+                }
+
+            } while (userExists == false);
+        } else {
+            System.out.println("No se encuentran usuarios, por favor cree alguno");
+            System.out.println();
+            createUser(listaEstudiantes, listaDocentes, listaUsuarios);
+        }
+
+    }
+
+    // Guardar las listas de los de usuarios
+    public static void guardarUsuarios(Object obj, Object obj2, Object obj3) {
+        try {
+
+            // Crear el directorio en caso de que no exista (Caso poco probable ya que es
+            // entorno local)
             String route = "src/proyecto/sysdata";
             File directory = new File(route);
-            if(!directory.exists()){
+            if (!directory.exists()) {
                 directory.mkdir();
             }
-            
-             //Streams para definir la ruta de guardado y manipulacion del objeto.
-            FileOutputStream openFile = new FileOutputStream(route+"/usuarios.obj");
+
+            // Streams para definir la ruta de guardado y manipulacion del objeto.
+            FileOutputStream openFile = new FileOutputStream(route + "/usuarios.obj");
             ObjectOutputStream saveObject = new ObjectOutputStream(openFile);
-            FileOutputStream openFile2 = new FileOutputStream(route+"/docentes.obj");
+            FileOutputStream openFile2 = new FileOutputStream(route + "/docentes.obj");
             ObjectOutputStream saveObject2 = new ObjectOutputStream(openFile2);
-            FileOutputStream openFile3 = new FileOutputStream(route+"/estudiantes.obj");
+            FileOutputStream openFile3 = new FileOutputStream(route + "/estudiantes.obj");
             ObjectOutputStream saveObject3 = new ObjectOutputStream(openFile3);
             saveObject.writeObject(obj);
             saveObject2.writeObject(obj2);
@@ -101,46 +197,49 @@ public class Proyecto {
             e.printStackTrace();
         }
     }
-    
-    protected static ArrayList<Usuario> getUsuariosDatabase(){
+    @SuppressWarnings("unchecked")
+    protected static ArrayList<Usuario> getUsuariosDatabase() {
         ArrayList<Usuario> lista = new ArrayList<Usuario>();
-          //Bloque try-catch para encontrar los usuarios sin importar su tipo. En caso de no existir, se mandará el ArrayList  completamente nuevo.
-        try{
+        // Bloque try-catch para encontrar los usuarios sin importar su tipo. En caso de
+        // no existir, se mandará el ArrayList completamente nuevo.
+        try {
             FileInputStream openFile = new FileInputStream("src/proyecto/sysdata/usuarios.obj");
             ObjectInputStream readObject = new ObjectInputStream(openFile);
-            
-           lista = (ArrayList<Usuario>)readObject.readObject(); ///Siempre regresa un objeto de la Clase Object, se forza el Cast para convertirlo a ArrayList de Usuario.
-            System.out.println("Usuarios encontrados");
+
+            lista = (ArrayList<Usuario>) readObject.readObject(); /// Siempre regresa un objeto de la Clase Object, se
+                                                                  /// forza el Cast para convertirlo a ArrayList de
+                                                                  /// Usuario.
+            // System.out.println("Usuarios encontrados");
             readObject.close();
             return lista;
-            
-        }catch(FileNotFoundException e){
-            
+
+        } catch (FileNotFoundException e) {
+
             // System.out.println("Los usuarios no fueron encontrados");
-        }catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
         return lista;
     }
-
-    protected static ArrayList<Docente> getDocentesDatabase(){
+    @SuppressWarnings("unchecked")
+    protected static ArrayList<Docente> getDocentesDatabase() {
         ArrayList<Docente> docentes = new ArrayList<Docente>();
-         //Bloque try-catch para encontrar los usuarios de tipo Docente. En caso de no existir, se mandará el ArrayList nuevo.
-        try{
+        // Bloque try-catch para encontrar los usuarios de tipo Docente. En caso de no
+        // existir, se mandará el ArrayList nuevo.
+        try {
             FileInputStream openDocentesFile = new FileInputStream("src/proyecto/sysdata/docentes.obj");
             ObjectInputStream readDocentes = new ObjectInputStream(openDocentesFile);
 
-            @SuppressWarnings("unchecked")
-            ArrayList<Docente> docentes = (ArrayList<Docente>)readDocentes.readObject();
-            System.out.println("Docentes encontrados");
+            docentes = (ArrayList<Docente>) readDocentes.readObject();
+            // System.out.println("Docentes encontrados");
             readDocentes.close();
             return docentes;
-        }catch(FileNotFoundException e){
-            
+        } catch (FileNotFoundException e) {
+
             // System.out.println("Los docentes no fueron encontrados");
-        }catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
@@ -148,137 +247,31 @@ public class Proyecto {
         return docentes;
     }
 
-    //Metodo para obtener los usuarios de tipo Estudiante (Si es que existen)
-    protected static ArrayList<Estudiante> getEstudiantesDatabase(){
+    // Metodo para obtener los usuarios de tipo Estudiante (Si es que existen)
+    @SuppressWarnings("unchecked")
+    protected static ArrayList<Estudiante> getEstudiantesDatabase() {
         ArrayList<Estudiante> estudiantes = new ArrayList<Estudiante>();
-        
-        //Bloque try-catch para encontrar los usuarios de tipo Estudiante. En caso de no existir, se mandará el ArrayList nuevo.
-        try{
-            FileInputStream openEstudiantesFile = new FileInputStream("src/proyecto/sysdata/estudiantes.obj");
-            ObjectInputStream readEstudiantes =  new ObjectInputStream(openEstudiantesFile);
 
-            estudiantes = (ArrayList<Estudiante>)readEstudiantes.readObject();
-            System.out.println("Estudiantes encontrados");
+        // Bloque try-catch para encontrar los usuarios de tipo Estudiante. En caso de
+        // no existir, se mandará el ArrayList nuevo.
+        try {
+            FileInputStream openEstudiantesFile = new FileInputStream("src/proyecto/sysdata/estudiantes.obj");
+            ObjectInputStream readEstudiantes = new ObjectInputStream(openEstudiantesFile);
+
+            estudiantes = (ArrayList<Estudiante>) readEstudiantes.readObject();
+            // System.out.println("Estudiantes encontrados");
             readEstudiantes.close();
             return estudiantes;
-        }catch(FileNotFoundException e){
-            
+        } catch (FileNotFoundException e) {
+
             // System.out.println("Los estudiantes no fueron encontrados");
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
-        }catch(ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
 
         return estudiantes;
 
     }
-
-    // Método para crear usuarios
-    public static void createUser(ArrayList<Estudiante> listaEstudiantes, ArrayList<Docente> listaDocentes, ArrayList<Usuario> listaUsuarios) {
-        
-        String option = "";
-        System.out.print("Ingrese su nombre de usuario: ");
-        username = input.nextLine();
-        System.out.print("Ingrese su contraseña: ");
-        password = input.nextLine();
-        System.out.print("Ingrese sus nombres: ");
-        name = input.nextLine();
-        System.out.print("Ingrese sus apellidos: ");
-        lastName = input.nextLine();
-
-        
-
-        //Asignación de valores del usuario
-        System.out.println("Indique el tipo de usuario: \na) Docente \tb) Estudiante");
-        option = input.nextLine();
-        //Verificación de opción
-        while(!option.equalsIgnoreCase("a") && !option.equalsIgnoreCase("b")){
-            System.out.println("Elija una opción válida");
-            option = input.nextLine();
-        }
-        
-        //Switch de opciones
-        switch(option.toLowerCase()){
-            case "a"->{
-                System.out.print("Ingrese sus matricula: ");
-                noMatricula = input.next();
-                //Añade el usuario creado a ambas listas
-                listaDocentes.add(new Docente(username, password, name, lastName, noMatricula));
-                listaUsuarios.add(listaDocentes.get(listaDocentes.size()-1));
-            } 
-
-            case "b"->{
-                //Añade el usuario creado a ambas listas
-                listaEstudiantes.add(new Estudiante(username, password, name, lastName));
-                listaUsuarios.add(listaEstudiantes.get(listaEstudiantes.size()-1));
-                for(int i=0; i<listaEstudiantes.size(); i++){
-                    System.out.println(listaEstudiantes.get(i).getUsername());
-                }
-            }      
-               
-        } 
-        
-    }
-
-    //Método para iniciar sesión
-    public static void logIn(ArrayList<Usuario> listaUsuarios, ArrayList<Docente> listaDocentes, ArrayList<Estudiante> listaEstudiantes){
-        boolean userExists = false;
-
-        if(listaUsuarios.size()>0){
-            do{
-                //Ingresamos los datos de la sesión
-                System.out.print("Ingrese su nombre de usuario: ");
-                username = input.next();
-                System.out.print("Ingrese su contraseña: ");
-                password = input.next();
-                System.out.println();
-                
-                // Verificamos si los datos ingresados concuerdan con algún usuario de la lista de usarios
-                for (int i=0; i<listaUsuarios.size(); i++) {
-                    // Si encuentra un usuario accede a su sesión
-
-                    if(username.equalsIgnoreCase(listaUsuarios.get(i).getUsername()) && password.equals(listaUsuarios.get(i).getPassword())){
-                        userExists=true;
-                        System.out.println("Sesión iniciada exitosamente"); 
-                        System.out.println();
-                        //Verifica qué tipo de usuario entró
-                        if(listaUsuarios.get(i) instanceof Estudiante){
-                            //Llamar al método para la calificación
-                            
-                            System.out.println("Es un estudiante");
-    
-                        }else if(listaUsuarios.get(i) instanceof Docente){
-                            //Llamar al método para profesores
-                           
-                            System.out.println("Es un Docente");
-                        }
-                        break;
-                    // Si no encuentra a un usuario lo marca como incorrecto y vuelve a pedir los datos
-                    }else{
-                        if(i==listaUsuarios.size()-1){
-                            System.out.println("Usuario y/o contraseña incorrectos");
-                            System.out.println();
-                        }
-                    }    
-                
-                }
-                    
-            }while(userExists == false);
-        } else{
-            System.out.println("No se encuentran usuarios, por favor cree alguno");
-            System.out.println();
-            createUser(listaEstudiantes, listaDocentes, listaUsuarios);
-        } 
-        
-        
-    }
-
 }
-
-
-
-
-
-
-

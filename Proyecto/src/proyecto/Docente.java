@@ -1,5 +1,5 @@
 package proyecto;
-import java.io.Serializable;
+
 public class Docente extends Usuario {
 
     private String noMatricula;

@@ -1,6 +1,6 @@
 package proyecto;
 
-import java.io.Serializable;
+
 import java.util.Calendar;
 
 public class Estudiante extends Usuario{
