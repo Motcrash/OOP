@@ -2,18 +2,17 @@ package proyecto;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-
-import java.util.InputMismatchException;
 //Imports para el manejo de archivos binarios.
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.File;
 
 public class Proyecto {
+    static ArrayList<Usuario> listaUsuarios = getUsuariosDatabase();
+    static ArrayList<Estudiante> listaEstudiantes = getEstudiantesDatabase();
+    static ArrayList<Docente> listaDocentes = getDocentesDatabase();
     static Scanner input = new Scanner(System.in);
     static String user, password, username, lastName, name, noMatricula, materia;
     static int numEstudiantes = 0;
@@ -25,9 +24,6 @@ public class Proyecto {
         // existentes
         // En caso de no existir dicho archivo, se generara una nueva ArrayList de cada
         // tipo.
-        ArrayList<Usuario> listaUsuarios = getUsuariosDatabase();
-        ArrayList<Estudiante> listaEstudiantes = getEstudiantesDatabase();
-        ArrayList<Docente> listaDocentes = getDocentesDatabase();
         try {
             menu(listaUsuarios, listaDocentes, listaEstudiantes);
         } catch (Exception e) {
@@ -35,7 +31,7 @@ public class Proyecto {
                                  // atrapamos todas.
         } finally {
             input.close();
-            guardarUsuarios(listaUsuarios, listaDocentes, listaEstudiantes);
+            Usuario.guardarUsuarios(listaUsuarios, listaDocentes, listaEstudiantes);
         }
 
     }
@@ -57,166 +53,19 @@ public class Proyecto {
             switch (option.toLowerCase()) {
                 case "a" -> {
                     // logIn(listaUsuarios,listaDocentes,listaEstudiantes);
-                    logIn(listaUsuarios, listaDocentes, listaEstudiantes);
+                    Usuario.logIn(listaUsuarios, listaDocentes, listaEstudiantes);
                     break;
                 }
 
                 case "b" -> {
                     // createUser(listaEstudiantes, listaDocentes, listaUsuarios);
-                    createUser(listaEstudiantes, listaDocentes, listaUsuarios);
+                    Usuario.createUser(listaEstudiantes, listaDocentes, listaUsuarios);
                 }
                 case "c" -> {
                     break;
                 }
             }
         } while (!option.equalsIgnoreCase("c") && !option.equalsIgnoreCase("a"));
-    }
-
-    // Método para crear usuarios
-    public static void createUser(ArrayList<Estudiante> listaEstudiantes, ArrayList<Docente> listaDocentes,
-            ArrayList<Usuario> listaUsuarios) {
-        String option2 = "";
-        System.out.print("Ingrese su nombre de usuario: ");
-        username = input.nextLine();
-        System.out.print("Ingrese su contraseña: ");
-        password = input.nextLine();
-        System.out.print("Ingrese sus nombres: ");
-        name = input.nextLine();
-        System.out.print("Ingrese sus apellidos: ");
-        lastName = input.nextLine();
-
-        // Asignación de valores del usuario
-        System.out.println("Indique el tipo de usuario: \na) Docente \tb) Estudiante");
-        option2 = input.nextLine();
-        // Verificación de opción
-        while (!option2.equalsIgnoreCase("a") && !option2.equalsIgnoreCase("b")) {
-            System.out.println("Elija una opción válida");
-            option2 = input.nextLine();
-        }
-
-        // Switch de opciones
-        switch (option2.toLowerCase()) {
-            case "a" -> {
-                System.out.print("Ingrese sus matricula: ");
-                noMatricula = input.next();
-                System.out.print("Ingrese la materia que impartirá: ");
-                materia = input.next();
-                // Añade el usuario creado a ambas listas
-
-                listaDocentes.add(new Docente(username, password, name, lastName, noMatricula, materia));
-                listaUsuarios.add(listaDocentes.get(listaDocentes.size() - 1));
-                System.out.println("Usuario creado exitosamente");
-            }
-
-            case "b" -> {
-                // Añade el usuario creado a ambas listas
-                if (listaDocentes.size() == 0) {
-                    System.out.println();
-                    System.out.println("No hay docentes inscritos, por favor asigne al menos un docente");
-                    System.out.println();
-                } else {
-                    listaEstudiantes.add(new Estudiante(username, password, name, lastName));
-                    listaUsuarios.add(listaEstudiantes.get(listaEstudiantes.size() - 1));
-                    asignarAlumnos(listaEstudiantes, listaDocentes);
-                    System.out.println("Usuario creado exitosamente");
-                }
-            }
-
-        }
-    }
-
-    // Método para iniciar sesión
-    public static void logIn(ArrayList<Usuario> listaUsuarios, ArrayList<Docente> listaDocentes,
-            ArrayList<Estudiante> listaEstudiantes) {
-        boolean userExists = false;
-
-        if (listaUsuarios.size() > 0) {
-            do {
-                // Ingresamos los datos de la sesión
-                System.out.print("Ingrese su nombre de usuario: ");
-                username = input.next();
-                System.out.print("Ingrese su contraseña: ");
-                password = input.next();
-                System.out.println();
-
-                // Verificamos si los datos ingresados concuerdan con algún usuario de la lista
-                // de usarios
-                for (int i = 0; i < listaUsuarios.size(); i++) {
-                    // Si encuentra un usuario accede a su sesión
-
-                    if (username.equalsIgnoreCase(listaUsuarios.get(i).getUsername())
-                            && password.equals(listaUsuarios.get(i).getPassword())) {
-                        userExists = true;
-                        System.out.println("Sesión iniciada exitosamente");
-                        System.out.println();
-                        // Verifica qué tipo de usuario entró
-                        if (listaUsuarios.get(i) instanceof Estudiante) {
-                            for (int j = 0; j < listaEstudiantes.size(); j++) {
-                                if (username.equalsIgnoreCase(listaEstudiantes.get(j).getUsername())
-                                        && password.equals(listaEstudiantes.get(j).getPassword())) {
-                                    Estudiante.mostrarCalificaciones(listaDocentes, listaEstudiantes.get(j).getName(),
-                                            listaEstudiantes.get(j).getLastName());
-                                }
-                            }
-                        } else if (listaUsuarios.get(i) instanceof Docente) {
-                            // Llamar al método para profesores
-                            capCalif(listaEstudiantes);
-
-                        }
-                        break;
-                        // Si no encuentra a un usuario lo marca como incorrecto y vuelve a pedir los
-                        // datos
-                    } else {
-                        if (i == listaUsuarios.size() - 1) {
-                            System.out.println("Usuario y/o contraseña incorrectos");
-                            System.out.println();
-                        }
-                    }
-
-                }
-
-            } while (userExists == false);
-        } else {
-            System.out.println("No se encuentran usuarios, por favor cree alguno");
-            System.out.println();
-            createUser(listaEstudiantes, listaDocentes, listaUsuarios);
-        }
-
-    }
-
-    // Guardar las listas de los de usuarios
-    public static void guardarUsuarios(Object obj, Object obj2, Object obj3) {
-        try {
-
-            // Crear el directorio en caso de que no exista (Caso poco probable ya que es
-            // entorno local)
-            String route = "src/proyecto/sysdata";
-            File directory = new File(route);
-            if (!directory.exists()) {
-                directory.mkdir();
-            }
-
-            // Streams para definir la ruta de guardado y manipulacion del objeto.
-            FileOutputStream openFile = new FileOutputStream(route + "/usuarios.obj");
-            ObjectOutputStream saveObject = new ObjectOutputStream(openFile);
-            FileOutputStream openFile2 = new FileOutputStream(route + "/docentes.obj");
-            ObjectOutputStream saveObject2 = new ObjectOutputStream(openFile2);
-            FileOutputStream openFile3 = new FileOutputStream(route + "/estudiantes.obj");
-            ObjectOutputStream saveObject3 = new ObjectOutputStream(openFile3);
-            saveObject.writeObject(obj);
-            saveObject2.writeObject(obj2);
-            saveObject3.writeObject(obj3);
-            saveObject.flush();
-            saveObject.close();
-            saveObject2.flush();
-            saveObject2.close();
-            saveObject3.flush();
-            saveObject3.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -295,77 +144,5 @@ public class Proyecto {
         }
 
         return estudiantes;
-    }
-
-    public static void asignarAlumnos(ArrayList<Estudiante> listaEstudiantes, ArrayList<Docente> listaDocentes) {
-        String estudiante;
-        estudiante = listaEstudiantes.get(listaEstudiantes.size() - 1).getName()
-                + listaEstudiantes.get(listaEstudiantes.size() - 1).getLastName();
-        for (int i = 0; i < listaDocentes.size(); i++) {
-            listaDocentes.get(i).listaAlumnos.add(estudiante);
-            System.out.println(listaDocentes.get(i).listaAlumnos.size());
-        }
-    }
-
-    public static void capCalif(ArrayList<Estudiante> listaAlumnos) {
-        String option3;
-        do {
-            int numAlumno = 0;
-            Scanner input = new Scanner(System.in);
-            String cali;
-            System.out.println("Seleccione el usuario que desea calificar");
-            for (int i = 0; i < listaAlumnos.size(); i++) {
-                if (listaAlumnos.get(i).getCalificacion() == 0) {
-                    cali = "Sin asignar";
-                } else
-                    cali = Double.toString(listaAlumnos.get(i).getCalificacion());
-                System.out.println((i + 1) + ") Nombre alumno: " + listaAlumnos.get(i).getName() + " " +
-                        listaAlumnos.get(i).getLastName() +
-                        "\tNumero de Control: " + listaAlumnos.get(i).getNumeroControl() +
-                        "\tCalificación: " + cali);
-            }
-            boolean flag = true;
-            do {
-
-                try {
-                    System.out.println();
-                    System.out.print("Ingrese el número del alumno: ");
-                    numAlumno = input.nextInt();
-                    while (numAlumno < 1 || numAlumno > listaAlumnos.size()) {
-                        System.out.print("Ingrese un número de alumno válido: ");
-                        numAlumno = input.nextInt();
-                    }
-                    flag = false;
-                } catch (InputMismatchException e) {
-                    System.out.println(input.next() + " No es un dato numerico, Ingrese unicamente datos numericos");
-                }
-            } while (flag);
-            flag = true;
-            do {
-                try {
-                    System.out.print("Ingrese la calificación del alumno: ");
-                    double calificacion = input.nextDouble();
-                    listaAlumnos.get(numAlumno - 1).setCalificacion(calificacion);
-                    flag = false;
-                } catch (InputMismatchException e) {
-                    System.out.println(input.next() + " " + "No es numerico, ingrese la calificacion nuevamente");
-                } catch (CalificacionExcepcion e) {
-                    System.out.println(input.next() + " " + e.getMessage());
-                }
-            } while (flag);
-
-            System.out.println();
-
-
-            
-            System.out.println("Seleccione una opción para continuar: \na) Salir \tb) Calificar a otro alumno");
-            option3 = input.next();
-            while (!option3.equalsIgnoreCase("a") && !option3.equalsIgnoreCase("b")) {
-                System.out.println("Seleccione una opción válida");
-                option3 = input.next();
-            }
-
-        } while (!option3.equalsIgnoreCase("a"));
-
     }
 }

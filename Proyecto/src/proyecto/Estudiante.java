@@ -6,7 +6,7 @@ import java.util.Calendar;
 public class Estudiante extends Usuario {
 
     private String numeroControl;
-    private double calificacion;
+    private double[] calificacion = new double[7];
 
     private static int numEstudiantes;
     private int numEstudiante;
@@ -56,24 +56,42 @@ public class Estudiante extends Usuario {
         return numEstudiante;
     }
 
-    public double getCalificacion() {
-        return calificacion;
-    }
+    public double getCalificacion(int n) {
+        return calificacion[n];
+    } 
 
-    public void setCalificacion(Double calificacion) throws CalificacionExcepcion {
+    public void setCalificacion(Double calificacion , int n) throws CalificacionExcepcion {
 
         if (calificacion >= 0.0 && calificacion <= 10.0) {
-            this.calificacion = calificacion;
+            this.calificacion[n] = calificacion;
         } else
             throw new CalificacionExcepcion("La calificacion no esta en un rango valido, ingrese una calificación válida.");
-
     }
 
-    public static void mostrarCalificaciones(ArrayList<Docente> listaDocentes, String name, String lastName) {
-        System.out.println("Alumno: " + name + " " + lastName);
-        String fullName = name + " " + lastName;
+    public static void mostrarCalificaciones(ArrayList<Docente> listaDocentes,ArrayList<Estudiante> listaEstudiantes, int n) {
+        System.out.println("Bienvenido "+ listaEstudiantes.get(n).getName()+" "
+            +listaEstudiantes.get(n).getLastName()+" - "+listaEstudiantes.get(n).getNumeroControl());
+        System.out.printf("%s %30s %30s %30s %30s","Nombre/s","Apellido/s","Matricula","Materia","Calificacion");
+        System.out.println();
+        for(int i=0; i<listaDocentes.size();i++){
+            String calificacion = Double.toString(listaEstudiantes.get(n).getCalificacion(i));
+            if(listaEstudiantes.get(n).getCalificacion(i)==0) calificacion="Sin capturar";
+            System.out.printf("%s %16s %35s %35s %25s", listaDocentes.get(i).getName(), listaDocentes.get(i).getLastName(),
+            listaDocentes.get(i).getNoMatricula(),listaDocentes.get(i).getMateria(),calificacion);
+            System.out.println();
+        }
 
         
+    }
+
+    public static void asignarAlumnos(ArrayList<Estudiante> listaEstudiantes, ArrayList<Docente> listaDocentes) {
+        String estudiante;
+        estudiante = listaEstudiantes.get(listaEstudiantes.size() - 1).getName()
+                + listaEstudiantes.get(listaEstudiantes.size() - 1).getLastName();
+        for (int i = 0; i < listaDocentes.size(); i++) {
+            listaDocentes.get(i).listaAlumnos.add(estudiante);
+           
+        }
     }
 
 }
